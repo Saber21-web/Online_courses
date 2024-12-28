@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stripe Payment</title>
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <h1>Оплата</h1>
+    <p>Введите данные вашей карты для завершения платежа.</p>
+
+    <!-- Форма Stripe -->
+    <form id="payment-form">
+        <div id="payment-element"></div> <!-- Здесь отобразится форма -->
+        <button id="submit">Pay now</button>
+        <div id="error-message"></div> <!-- Сообщение об ошибке -->
+    </form>
+
+    <!-- Подключаем JS -->
+    <script>
+        const stripe = Stripe("{{ stripe_public_key }}");
+        const elements = stripe.elements();
+        const paymentElement = elements.create("payment");
+        paymentElement.mount("#payment-element");
+
+        document.getElementById("payment-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const { error } = await stripe.confirmPayment({
+                elements,
+                confirmParams: { return_url: "/payments/success/" },
+            });
+            if (error) {
+                document.querySelector("#error-message").textContent = error.message;
+            }
+        });
+    </script>
+</body>
+</html>

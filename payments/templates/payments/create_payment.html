@@ -1,0 +1,6 @@
+<h2>Оплата курса</h2>
+<p>Вы собираетесь оплатить курс с ID: {{ course_id }}</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Оплатить</button>
+</form>

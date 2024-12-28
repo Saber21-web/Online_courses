@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-5">
+        <!-- Блок для сообщений -->
+        {% if messages %}
+        <div class="alert-messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} mt-3">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    <h1 class="mb-4 text-center text-primary">Детали курса</h1>
+    
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <!-- Информация о курсе -->
+            <div class="mb-3">
+                <h5 class="font-weight-bold text-muted">Заголовок:</h5>
+                <p class="form-control-plaintext">{{ course.title }}</p>
+            </div>
+
+            <h5>О преподавателе</h5>
+            <p class="text-muted">{{ course.date }} - 
+                {% if course.instructor %}
+                    <a href="{% url 'users:profile' course.instructor.id %}">@{{ course.instructor.username }}</a>
+                {% else %}
+                    Автор не указан
+                {% endif %}
+            </p>
+
+            <div class="mb-3">
+                <h5 class="font-weight-bold text-muted">Описание:</h5>
+                <p class="form-control-plaintext">{{ course.description }}</p>
+            </div>
+
+            <!-- Видео -->
+            <div class="mb-3">
+                <h5 class="font-weight-bold text-muted">Видео:</h5>
+                {% if course.video %}
+                    <video id="course-video" class="w-100 mt-2" height="auto" controls>
+                        <source src="{{ course.video.url }}" type="video/mp4">
+                        <source src="{{ course.video.url }}" type="video/webm">
+                        <source src="{{ course.video.url }}" type="video/ogg">
+                        Ваш браузер не поддерживает воспроизведение видео.
+                    </video>
+                {% else %}
+                    <p>Видео отсутствует</p>
+                {% endif %}
+            </div>
+
+            <!-- Части курса -->
+            <div class="mt-4">
+                <h5 class="font-weight-bold text-muted">Части курса:</h5>
+                {% if course.parts.all %}
+                    <ul class="list-group">
+                        {% for part in course.parts.all %}
+                            <li class="list-group-item">
+                                <h6 class="d-flex justify-content-between align-items-center">
+                                    Часть {{ forloop.counter }}: {{ part.title }}
+                                    <div>
+                                        <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#part-{{ part.id }}" aria-expanded="false" aria-controls="part-{{ part.id }}">
+                                            Подробнее
+                                        </button>
+                                        <!-- Кнопки редактирования и удаления  -->
+                                        {% if user == course.instructor or user.is_superuser %}
+                                        <a href="{% url 'courses:edit_course_part' part.id %}" class="btn btn-sm btn btn-primary">Редактировать</a>
+                                        <form action="{% url 'courses:delete_course_part' part.id %}" method="post" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-danger">Удалить</button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </h6>
+            
+                                <div class="collapse mt-2" id="part-{{ part.id }}">
+                                    {% if part.is_free or has_purchased %}
+                                        <!-- Доступная часть -->
+                                        <p class="text-muted">{{ part.content }}</p>
+                                        {% if part.video %}
+                                            <video class="w-100" controls>
+                                                <source src="{{ part.video.url }}" type="video/mp4">
+                                                Ваш браузер не поддерживает воспроизведение видео.
+                                            </video>
+                                        {% endif %}
+                                    {% else %}
+                                        <!-- Закрытая часть курса -->
+                                        <p class="text-danger">Часть доступна только после покупки курса.</p>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">У этого курса нет частей.</p>
+                {% endif %}
+            </div>
+            
+            <div class="d-flex justify-content-start mt-3 gap-2">
+                {% if user.is_authenticated %}
+                    {% if user in course.purchased_by.all %}
+                        <p class="text-success">Вы уже приобрели этот курс!</p>
+                    {% else %}
+                        {% if course.payment_link %}
+                            <a href="{{ course.payment_link }}" class="btn btn-primary">Купить курс</a>
+                        {% else %}
+                            <p class="text-warning">Пока что купить курс нельзя</p>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if user == course.instructor or user.is_superuser %}
+                        <a href="{% url 'courses:course_update' course.id %}" class="btn btn-primary">Редактировать курс</a>
+                        <a href="{% url 'courses:course_delete' course.id %}" class="btn btn-danger">Удалить курс</a>
+                        <a href="{% url 'courses:course_part' course.id %}" class="btn btn-success">Добавить другие части курса</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'users:login' %}" class="btn btn-primary">
+                        Войдите, чтобы купить курс
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Комментарии  -->
+    <div class="row mt-4">
+        <div class="col-8">
+            <h3>Комментарии к курсу: {{ course.title }}</h3>
+            <hr>
+            <form action="" method="post" class="d-flex">
+                {% csrf_token %}
+                <input type="text" name="comment" class="form-control" placeholder="Введите комментарий...">
+                <button type="submit" class="btn btn-primary">Отправить</button>
+            </form>
+
+            <div class="d-flex flex-column gap-2 mt-3">
+                {% for comment in course.comment_set.all %}
+                    <div class="d-flex align-items-center gap-2 justify-content-between">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex flex-column gap-1">
+                                <span>
+                                    <strong>{{ comment.user.username }}</strong>
+                                    <sup>{{ comment.date|date:"d M Y H:i" }}</sup>
+                                </span>
+                                <p>{{ comment.text }}</p>
+                            </div>
+                        </div>
+                        {% if request.user == comment.user or request.user.is_superuser %}
+                            <a href="{% url 'courses:comment_delete' comment.id %}" class="btn btn-danger">
+                                <i class='bx bx-trash'></i> Удалить
+                            </a>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <p>Комментариев пока нет.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Скрипт для скрытия уведомлений через несколько секунд
+    document.addEventListener('DOMContentLoaded', function() {
+        // Находим все сообщения
+        const messages = document.querySelectorAll('.alert');
+        
+        // Проходим по каждому сообщению
+        messages.forEach(function(message) {
+            // Через 3 секунды скрываем сообщение
+            setTimeout(function() {
+                message.style.display = 'none';
+            }, 3000); // 3000 миллисекунд = 3 секунды
+        });
+    });
+</script>
+{% endblock %}

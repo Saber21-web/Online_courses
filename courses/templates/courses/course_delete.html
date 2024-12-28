@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-5">
+    <h1 class="text-danger">Подтверждение удаления</h1>
+    <p>Вы уверены, что хотите удалить курс "{{ course.title }}"?</p>
+    <p>Вы не сможете востанавить курса после удаления.</p>
+
+    <!-- Форма для удаления курса -->
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Удалить курс</button>
+      <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-secondary">Отмена</a>
+    </form>
+  </div>
+{% endblock %}

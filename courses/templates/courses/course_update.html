@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load form_tags %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-sm-12">
+            <h2 class="mb-4 text-center text-primary">Обновить курс: {{ course.title }}</h2>
+            <form method="post" enctype="multipart/form-data" class="bg-light p-4 rounded shadow">
+                {% csrf_token %}
+                <!-- Заголовок -->
+                <div class="mb-3">
+                    <label for="id_title" class="form-label">Заголовок</label>
+                    {{ form.title|add_class:"form-control" }}
+                </div>
+                
+                <!-- Описание -->
+                <div class="mb-3">
+                    <label for="id_description" class="form-label">Описание</label>
+                    {{ form.description|add_class:"form-control" }}
+                </div>
+                
+                <!-- Инструктор -->
+                <div class="mb-3">
+                    <label for="id_instructor" class="form-label">Инструктор</label>
+                    {{ form.instructor|add_class:"form-control" }}
+                </div>
+                
+                <!-- Цена -->
+                <div class="mb-3">
+                    <label for="id_price" class="form-label">Цена</label>
+                    {{ form.price|add_class:"form-control" }}
+                </div>
+                
+                <!-- Видео -->
+                <div class="mb-3">
+                    <label for="id_video" class="form-label">Видео</label>
+                    {{ form.video|add_class:"form-control" }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.category.id_for_label }}" class="form-label">Категория</label>
+                    {{ form.category|add_class:"form-select form-select-sm" }}
+                    {% if form.category.errors %}
+                        <div class="text-danger">{{ form.category.errors }}</div>
+                    {% endif %}
+                </div>
+
+                        <!-- Поле Ссылка на оплату -->
+                <div class="mb-3">
+                    <label for="{{ form.payment_link.id_for_label }}" class="form-label">Ссылка на оплату</label>
+                    {{ form.payment_link|add_class:"form-control form-control-sm" }}
+                    {% if form.payment_link.errors %}
+                        <div class="text-danger">{{ form.payment_link.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Кнопки -->
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-success">Сохранить</button>
+                    <a href="{% url 'courses:course_detail' course.id %}" class="btn btn-secondary">Отмена</a>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

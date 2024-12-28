@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Блок для сообщений -->
+    {% if messages %}
+    <div class="alert-messages">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mt-3">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <h1 class="text-success">Успешная покупка!</h1>
+    
+    {% if has_purchased %}
+        <p>Вы уже приобрели этот курс. Можете получить доступ к его материалам на странице курса.</p>
+        <a href="{% url 'courses:course_detail' course.id %}" class="btn btn-primary">Перейти к курсу</a>
+    {% else %}
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="success" value="true">
+            <button type="submit" class="btn btn-success">Подтвердить покупку</button>
+        </form>
+    {% endif %}
+</div>
+<script>
+    // Скрипт для скрытия уведомлений через несколько секунд
+    document.addEventListener('DOMContentLoaded', function() {
+        // Находим все сообщения
+        const messages = document.querySelectorAll('.alert');
+        
+        // Проходим по каждому сообщению
+        messages.forEach(function(message) {
+            // Через 3 секунды скрываем сообщение
+            setTimeout(function() {
+                message.style.display = 'none';
+            }, 3000); // 3000 миллисекунд = 3 секунды
+        });
+    });
+</script>
+{% endblock %}

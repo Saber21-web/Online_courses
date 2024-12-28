@@ -1,0 +1,62 @@
+<!-- course_list.html -->
+{% extends 'base.html' %}
+
+{% block title %}Курсы{% endblock %}
+
+{% block content %}
+
+<!-- Форма фильтрации -->
+<form method="get" class="
+filter-form row align-items-center">
+  <!-- Категории -->
+  <div class="col-md-4">
+      <select name="category" id="category" class="form-select">
+          <option value="">Все категории</option>
+          {% for category in categories %}
+              <option value="{{ category.id }}" {% if category_id == category.id|stringformat:"s" %}selected{% endif %}>
+                  {{ category.name }}
+              </option>
+          {% endfor %}
+      </select>
+  </div>
+
+  <!-- Поле поиска -->
+  <div class="col-md-4">
+      <input type="text" name="search" id="search" class="form-control" value="{{ search_query }}" placeholder="Введите название курса">
+  </div>
+
+  <!-- Кнопка -->
+  <div class="col-md-2">
+      <button type="submit" class="btn btn-primary w-100">Применить</button>
+  </div>
+</form>
+
+
+
+<div class="container mt-5">
+  <h1>Список курсов</h1>
+
+  <!-- Кнопка для создания курса доступна только для преподавателя и администратора -->
+  {% if request.user.role == 'teacher' or request.user.role == 'admin' %}
+    <a href="{% url 'courses:course_create' %}" class="btn btn-primary mb-2">Создать курс</a>
+  {% endif %}
+  
+  {% if request.user.is_superuser %}
+    <a href="{% url 'admin:index' %}" class="btn btn-primary mb-2">Страница админа</a>
+  {% endif %}
+
+  <div class="row">
+    {% for course in courses %}
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">{{ course.title }}</h5>
+          <p class="card-text">{{ course.description|truncatechars:100 }}</p>
+          <a href="{% url 'courses:course_detail' course.id %}" class="btn btn-primary">Подробнее</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

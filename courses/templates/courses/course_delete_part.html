@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center text-danger mb-4">Удалить часть курса</h1>
+    <div class="alert alert-warning">
+        <p>Вы уверены, что хотите удалить часть курса <strong>{{ part.title }}</strong>?</p>
+    </div>
+    <div class="d-flex justify-content-end">
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Удалить</button>
+        </form>
+        <a href="{% url 'courses:course_detail' part.course.id %}" class="btn btn-secondary ms-3">Отмена</a>
+    </div>
+</div>
+{% endblock %}
