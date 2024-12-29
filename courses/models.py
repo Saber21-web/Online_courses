@@ -13,7 +13,7 @@ class Category(models.Model):
     
 
 class Course(models.Model):
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=1000)
     description = models.TextField()
     instructor = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -32,7 +32,7 @@ class Course(models.Model):
     
 class CoursePart(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="parts")
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=1000)
     content = models.TextField(blank=True, null=True)
     is_free = models.BooleanField(default=False)
     video = models.FileField(upload_to='course_parts/', blank=True, null=True)
