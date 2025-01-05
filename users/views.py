@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login, authenticate, logout
 from courses.models import Course
 from users.models import CustomUser
-from .forms import CustomUserCreationForm, CustomUserLoginForm
+from .forms import *
 from django.contrib.auth.decorators import login_required
 
 
@@ -65,3 +65,6 @@ def profile(request, id):
 
     return render(request, 'users/profile.html', context)
 
+def password_reset(request):
+    password_reset = PasswordResetForm(request.POST)
+    return render(request, 'users/password_reset.html', {'password_reset': password_reset})
