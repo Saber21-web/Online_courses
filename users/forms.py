@@ -29,8 +29,7 @@ class CustomUserLoginForm(forms.Form):
                 raise forms.ValidationError("Неверный username или пароль")
         return cleaned_data
 
-class Password_reset_form(forms.Form):
+class PasswordResetForm(forms.Form):
     old_password = forms.CharField(label="Старый пароль", widget=forms.PasswordInput)
     new_password1 = forms.CharField(label="Новый пароль", widget=forms.PasswordInput)
     new_password2 = forms.CharField(label="Повторите новый пароль", widget=forms.PasswordInput)
-    
